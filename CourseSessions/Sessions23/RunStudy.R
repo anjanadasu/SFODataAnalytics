@@ -26,9 +26,11 @@ datafile_name="MBAadmin" #  do not add .csv at the end! make sure the data are n
 
 # Please ENTER the filename of the Report and Slides (in the doc directory) to generate 
 
-report_file = "Report_s23"
+#report_file = "Report_s23"
 #report_file = "MyBoatsFactor"
-slides_file = "Slides_s23"
+report_file = "Report_SFO"
+#slides_file = "Slides_s23"
+slides_file = "Slides_SFO"
 
 # Please ENTER then original raw attributes to use. 
 # Please use numbers, not column names! e.g. c(1:5, 7, 8) uses columns 1,2,3,4,5,7,8
@@ -97,6 +99,7 @@ if (start_local_webapp){
   MBAadmin <- read.csv(paste(local_directory, "data/MBAadmin.csv", sep = "/"), sep=";", dec=",") # this contains only the matrix ProjectData
   Boats <- read.csv(paste(local_directory, "data/Boats.csv", sep = "/"), sep=";", dec=",") # this contains only the matrix ProjectData
   Boats=data.matrix(Boats) # this file needs to be converted to "numeric"....
+  SFO <- read.csv(paste(local_directory, "data/SFO.csv", sep = "/"), sep=";", dec=",") # this contains only the matrix ProjectData
   
   # now run the app
   runApp(paste(local_directory,"tools", sep="/"))  
