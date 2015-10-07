@@ -1,30 +1,51 @@
 <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
-<style type="text/css"> body {padding: 10px 30px 10px 30px;} table,th, td {text-align: center;} </style>
+<style type="text/css"> body {padding: 10px 30px 10px 30px;} table,th, td {text-align: center;} 
+
+table.average_analysis > tbody > tr > td { 
+padding: 10px; 
+border: 1px solid #000;
+}
+table.average_analysis > thead > tr > th { 
+padding: 10px; 
+border: 1px solid #000;
+}
+
+</style>
 
 
 (Big) Data Analytics for SFO Airport
 ========================================================
 **Anjana Dasu, Pal Grewal, Kyunghee Kim, Devina Pasta, Dan Schwarz**
 
-
-About San Francisco Internaational Airport (SFO)
+About San Francisco International Airport (SFO)
 --------------------------------------------------------
 San Francisco International Airport (SFO) is the seventh busiest airport in the United States and the fifteenth busiest airport in the world by passenger count.
 
 The Data
 --------------------------------------------------------
-Our dataset consists of data pertaining to customer demographics and satisfaction with SFO Airport’s facilities, services, and initiatives. The data was collected in May 2011, through interviews with 3,872 customers in each of SFO’s terminals and boarding areas. Customers were asked to rate the Airport in 20 categories, including 6 cleanliness ratings. Additional data collected include customer spending behavior, mode of arrival to the airport, and awareness of SFO initiatives.
+We are analyzing the data from customer satisfaction survey responses. SFO collected this data through 3,872 interviews held at all airport terminals and boarding areas in the time period 11 May to 26 May 2011. The survey questions ask customers to rate the facilities and services at SFO such as parking, restaurants, shops, as well as attributes like cleanliness and ease of navigation through the airport. Passengers were also asked to rate the SFO website. Additional data collected include customer spending behavior, mode of arrival to the airport, and awareness of SFO initiatives.
 
 <a href="http://www.flysfo.com/media/customer-survey-data" target="_blank">SFO Customer Survey Data</a>
 
 The Decisions
 --------------------------------------------------------
+#### Business Processes and Management Decisions Affected
+Through analysis of this data, we will be able to identify the areas of SFO with whcih passengers are least satisfied. The management can use the analysis to focus on improving these facilities and services and implementing concrete measures to ensure higher customer satisfaction and an improved passenger experience at SFO. For example, the analysis can help management make informed decisions on resource allocation, training of personnel, use of third party services. Since the survey focuses on the end-to-end passenger experience, all business processes related to passenger services for departures from the airport will be affected.
 
+#### Organizational, Process, and Systems Changes
+
+In order to improve passenger experience, SFO will need to up its game in areas where customer satisfaction is low. For example, passengers have rated ‘restaurants’ lower than most other services. SFO can improve restaurant services through diversifying the cuisines available or providing additional training for restaurant personnel. SFO can also modify employee incentives to focus on areas that need improvement.  If cleanliness of certain areas within the airport needs to be improved, SFO might need to assign more cleaning personnel to these areas or increase the frequency of cleaning in these areas. If services like cleanliness are outsourced to third parties, SFO might have to revisit the contracts or look for new service providers. SFO can also leverage best practices from other areas of the airport where customer satisfaction is high. For example, cleanliness of parking facilities is rated as high, however cleanliness in other areas is low. 
+
+There could be resistance from labor unions due to changed incentive systems and if there is a need to let go of some employees who do not match up to the performance standards. Additionally, the restaurants at the airport may resist excess regulation by SFO.
+
+#### Measuring Value of Proposal
+Through concrete improvements for certain areas at the airport, SFO can ensure better passenger experience. To measure the impact, SFO can conduct a similar survey post implementation of changes and check if the ratings for the specific parameters have improved. 
 
 The Analysis
 --------------------------------------------------------
-### SFO Facilities and Customers
-We believed that our 
+### SFO Facilities
+
+In order to improve customers' overall airport experience, the SFO team should focus on providing good facilities. We used factor analysis to identify which areas on which it might be worthwhile to invest.
 
 Customers were first asked to rate several attributes (e.g. restaurants, information monitors, etc.) of SFO on a rating scale of 1-5 (1 = Unacceptable, 2 = Below Average, 3 = Average, 4 = Good, 5 = Outstanding). Next, customers were asked to rate the general cleanliness of various airport facilities (e.g. boarding areas, restrooms, etc.) on the same scale.
 
@@ -152,15 +173,35 @@ Based on eigenvalue > 1 or scree plot, we would choose to use `r eigenvalue_fact
 
 However, we ultimately chose to manually select `r factors_selected` factors based on our rotated factors matrix. as this would explain ~75% of the variance and could be translated into an identifiable set of components, namely:
 <ol>
-<li>Airport interior - exhibits, shops, directions, walkways</li>
-<li>Information - screens/monitors, booths</li>
-<li>Transit - entering and exiting the airport</li>
-<li>Boarding areas and general ambience</li>
-<li>Cleanliness</li>
-<li>Interterminal Connectivity - parking and transportation</li>
+<li>RETAIL - exhibits, restaurants, shops, directions, walkways</li>
+<li>INFORMATION - screens/monitors, booths</li>
+<li>TRANSIT - entering and exiting the airport</li>
+<li>BOARDING AREA</li>
+<li>CLEANLINESS</li>
+<li>INTERCONNECTEDNESS - parking and inter-terminal transportation</li>
 </ol>
 
 This grouping was derived from our rotated factors matrix:
+
+```{r echo=FALSE, comment=NA, warning=FALSE, message=FALSE,results='asis'}
+
+Rotated_Results<-principal(ProjectDataFactor, nfactors=max(factors_selected), rotate=rotation_used,score=TRUE)
+Rotated_Factors<-round(Rotated_Results$loadings,2)
+Rotated_Factors<-as.data.frame(unclass(Rotated_Factors))
+colnames(Rotated_Factors)<-paste("Component",1:ncol(Rotated_Factors),sep=" ")
+
+sorted_rows <- sort(Rotated_Factors[,1], decreasing = TRUE, index.return = TRUE)$ix
+Rotated_Factors <- Rotated_Factors[sorted_rows,]
+
+show_data <- Rotated_Factors
+#show_data = show_data[1:min(max_data_report,nrow(show_data)),]
+row<-rownames(show_data)
+dfnew<-cbind(row,show_data)
+change<-colnames(dfnew)
+change[1]<-"Variables"
+colnames (dfnew)<-change
+m1<-gvisTable(dfnew,options=list(showRowNumber=TRUE,width=1220, height=min(400,27*(nrow(show_data)+1)),allowHTML=TRUE,page='disable'))
+```
 
 ```{r echo=FALSE, comment=NA, warning=FALSE, message=FALSE,results='asis'}
 Rotated_Factors_thres <- Rotated_Factors
@@ -187,4 +228,151 @@ For each of the factors, we decided upon the original raw attribute which we fel
 <li>Cleanliness of boarding areas</li>
 <li>Cleanliness of restrooms</li>
 <li>Airtrain</li>
+</ul>
+
+<!-- @TODO: FACTOR SCORES: In this case, factor scores will represent the area of the airport it seems most relevant to focus on. -->
+
+### Terminal-Based Analysis
+
+We wanted to examine if customers' perceptions of the 6 factors (RETAIL, INFORMATION, TRANSIT, BOARDING AREA, CLEANLINESS, and INTERCONNECTEDNESS) and the airport overall differed based by the terminal at which they spent time.
+
+<table class="average_analysis">
+<thead>
+<tr>
+<th>Status</th>
+<th>RETAIL</th>
+<th>INFORMATION</th>
+<th>TRANSIT</th>
+<th>BOARDING AREA</th>
+<th>CLEANLINESS</th>
+<th>INTERCONNECTEDNESS</th>
+<th>OVERALL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Terminal 1</td>
+<td>`r round(Terminal1Average[1], digits=2)`</td>
+<td>`r round(Terminal1Average[2], digits=2)`</td>
+<td>`r round(Terminal1Average[3], digits=2)`</td>
+<td>`r round(Terminal1Average[4], digits=2)`</td>
+<td>`r round(Terminal1Average[5], digits=2)`</td>
+<td>`r round(Terminal1Average[6], digits=2)`</td>
+<td>`r round(Terminal1Average[7], digits=2)`</td>
+</tr>
+<tr>
+<td>Terminal 2</td>
+<td>`r round(Terminal2Average[1], digits=2)`</td>
+<td>`r round(Terminal2Average[2], digits=2)`</td>
+<td>`r round(Terminal2Average[3], digits=2)`</td>
+<td>`r round(Terminal2Average[4], digits=2)`</td>
+<td>`r round(Terminal2Average[5], digits=2)`</td>
+<td>`r round(Terminal2Average[6], digits=2)`</td>
+<td>`r round(Terminal2Average[7], digits=2)`</td>
+</tr>
+<tr>
+<td>Terminal 3</td>
+<td>`r round(Terminal3Average[1], digits=2)`</td>
+<td>`r round(Terminal3Average[2], digits=2)`</td>
+<td>`r round(Terminal3Average[3], digits=2)`</td>
+<td>`r round(Terminal3Average[4], digits=2)`</td>
+<td>`r round(Terminal3Average[5], digits=2)`</td>
+<td>`r round(Terminal3Average[6], digits=2)`</td>
+<td>`r round(Terminal3Average[7], digits=2)`</td>
+</tr>
+<tr>
+<td>International Terminal</td>
+<td>`r round(TerminalIntlAverage[1], digits=2)`</td>
+<td>`r round(TerminalIntlAverage[2], digits=2)`</td>
+<td>`r round(TerminalIntlAverage[3], digits=2)`</td>
+<td>`r round(TerminalIntlAverage[4], digits=2)`</td>
+<td>`r round(TerminalIntlAverage[5], digits=2)`</td>
+<td>`r round(TerminalIntlAverage[6], digits=2)`</td>
+<td>`r round(TerminalIntlAverage[7], digits=2)`</td>
+</tr>
+</tbody>
+</table>
+Our takeaways were the following:
+<ul>
+<li>Terminal 1 had the lowest average scores across all 6 factors, and the lowest average rating of the airport as a whole. Terminal 1 is one of SFO's oldest terminals. It's a good thing that Terminal 1 is <a href="http://www.flysfo.com/about-sfo/airport-development/t1">scheduled for renovation</a> in late 2015!</li>
+<li>Terminal 2 -- the main international terminal and the most recently rennovated -- has the highest average scores across most factors and the highest average rating of the airport as a whole.</li>
+<li>Restaurants consistently seem to be the lowest scored factor.</li>
+</ul>
+
+### Flight Delay-Based Analysis
+
+We wanted to examine if customers' perceptions of the 6 factors (RETAIL, INFORMATION, TRANSIT, BOARDING AREA, CLEANLINESS, and INTERCONNECTEDNESS) and the airport overall differed based on how delayed their flights were.
+
+<table class="average_analysis">
+<thead>
+<tr>
+<th>Status</th>
+<th>RETAIL</th>
+<th>INFORMATION</th>
+<th>TRANSIT</th>
+<th>BOARDING AREA</th>
+<th>CLEANLINESS</th>
+<th>INTERCONNECTEDNESS</th>
+<th>OVERALL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>On-time</td>
+<td>`r round(OnTimeAverage[1], digits=2)`</td>
+<td>`r round(OnTimeAverage[2], digits=2)`</td>
+<td>`r round(OnTimeAverage[3], digits=2)`</td>
+<td>`r round(OnTimeAverage[4], digits=2)`</td>
+<td>`r round(OnTimeAverage[5], digits=2)`</td>
+<td>`r round(OnTimeAverage[6], digits=2)`</td>
+<td>`r round(OnTimeAverage[7], digits=2)`</td>
+</tr>
+<tr>
+<td>Late by less than 15 minutes or possibly delayed</td>
+<td>`r round(Late15Average[1], digits=2)`</td>
+<td>`r round(Late15Average[2], digits=2)`</td>
+<td>`r round(Late15Average[3], digits=2)`</td>
+<td>`r round(Late15Average[4], digits=2)`</td>
+<td>`r round(Late15Average[5], digits=2)`</td>
+<td>`r round(Late15Average[6], digits=2)`</td>
+<td>`r round(Late15Average[7], digits=2)`</td>
+</tr>
+<tr>
+<td>Late by 16 - 45 minutes</td>
+<td>`r round(Late45Average[1], digits=2)`</td>
+<td>`r round(Late45Average[2], digits=2)`</td>
+<td>`r round(Late45Average[3], digits=2)`</td>
+<td>`r round(Late45Average[4], digits=2)`</td>
+<td>`r round(Late45Average[5], digits=2)`</td>
+<td>`r round(Late45Average[6], digits=2)`</td>
+<td>`r round(Late45Average[7], digits=2)`</td>
+</tr>
+<tr>
+<td>Late by 45 - 90 minutes</td>
+<td>`r round(Late90Average[1], digits=2)`</td>
+<td>`r round(Late90Average[2], digits=2)`</td>
+<td>`r round(Late90Average[3], digits=2)`</td>
+<td>`r round(Late90Average[4], digits=2)`</td>
+<td>`r round(Late90Average[5], digits=2)`</td>
+<td>`r round(Late90Average[6], digits=2)`</td>
+<td>`r round(Late90Average[7], digits=2)`</td>
+</tr>
+<tr>
+<td>Late by more than 90 minutes or possibly canceled</td>
+<td>`r round(SuperLateAverage[1], digits=2)`</td>
+<td>`r round(SuperLateAverage[2], digits=2)`</td>
+<td>`r round(SuperLateAverage[3], digits=2)`</td>
+<td>`r round(SuperLateAverage[4], digits=2)`</td>
+<td>`r round(SuperLateAverage[5], digits=2)`</td>
+<td>`r round(SuperLateAverage[6], digits=2)`</td>
+<td>`r round(SuperLateAverage[7], digits=2)`</td>
+</tr>
+</tbody>
+</table>
+Our takeaways were the following:
+<ul>
+<li>Interestingly, it wasn't the generally the case that longer wait times implied worse ratings.</li>
+<li>People with flights delayed by less than 15 minutes or a possibility of delay tended to have the lowest rankings across the board. Perhaps this is an indication that people are frustrated with uncertainty. Or perhaps longer delay times allow people to be "productive" and hence better pass the time.</li>
+<li>Out of the 6 factors, people seem to rank restaurants the lowest, consistent with our terminal scores.</li>
+<li>The overall impression of the airport is still much lower than any of the factors.</li>
 </ul>

@@ -53,7 +53,6 @@ MIN_VALUE=0.5
 # (DEFAULT is 50. If the number is large the report and slides may not be generated - very slow or will crash!!)
 max_data_report = 50 # can also chance in server.R
 
-
 ###########################
 # Would you like to also start a web application on YOUR LOCAL COMPUTER once the report and slides are generated?
 # Select start_webapp <- 1 ONLY if you run the case on your local computer
@@ -79,6 +78,115 @@ if (datafile_name == "Boats")
 
 factor_attributes_used = unique(sapply(factor_attributes_used,function(i) min(ncol(ProjectData), max(i,1))))
 ProjectDataFactor=ProjectData[,factor_attributes_used]
+
+### TERMINAL-BASED ANALYSIS
+derived_factor_columns = c(4, 7, 30, 36, 39, 43, 44, 48, 42)
+derived_factor_columns = unique(sapply(derived_factor_columns,function(i) min(ncol(ProjectData), max(i,1))))
+DerivedFactorsData = ProjectData[,derived_factor_columns]
+# Convert to data frame
+DerivedFactorsData = data.frame(DerivedFactorsData)
+
+# Terminal 1
+Terminal1 = subset(DerivedFactorsData, TERM == 1)
+Terminal1 = subset(Terminal1, select=c(Q8B.Restaurants, 
+                                       Q8H.Information.booths..upper.level.,
+                                       Q8K.AirTrain,
+                                       Q10A.Cleanliness.of.boarding.areas,
+                                       Q10B.Cleanliness.of.domestic.hourly.parking.garage,
+                                       Q10F.Cleanliness.of.Restrooms,
+                                       Q8N.SFO.Airport.as.a.whole))
+Terminal1Average = colMeans(Terminal1)
+
+# Terminal 2
+Terminal2 = subset(DerivedFactorsData, TERM == 2)
+Terminal2 = subset(Terminal2, select=c(Q8B.Restaurants, 
+                                       Q8H.Information.booths..upper.level.,
+                                       Q8K.AirTrain,
+                                       Q10A.Cleanliness.of.boarding.areas,
+                                       Q10B.Cleanliness.of.domestic.hourly.parking.garage,
+                                       Q10F.Cleanliness.of.Restrooms,
+                                       Q8N.SFO.Airport.as.a.whole))
+Terminal2Average = colMeans(Terminal2)
+
+# Terminal 3
+Terminal3 = subset(DerivedFactorsData, TERM == 3)
+Terminal3 = subset(Terminal3, select=c(Q8B.Restaurants, 
+                                       Q8H.Information.booths..upper.level.,
+                                       Q8K.AirTrain,
+                                       Q10A.Cleanliness.of.boarding.areas,
+                                       Q10B.Cleanliness.of.domestic.hourly.parking.garage,
+                                       Q10F.Cleanliness.of.Restrooms,
+                                       Q8N.SFO.Airport.as.a.whole))
+Terminal3Average = colMeans(Terminal3)
+
+# International Terminal
+TerminalIntl = subset(DerivedFactorsData, TERM == 4)
+TerminalIntl = subset(TerminalIntl, select=c(Q8B.Restaurants, 
+                                             Q8H.Information.booths..upper.level.,
+                                             Q8K.AirTrain,
+                                             Q10A.Cleanliness.of.boarding.areas,
+                                             Q10B.Cleanliness.of.domestic.hourly.parking.garage,
+                                             Q10F.Cleanliness.of.Restrooms,
+                                             Q8N.SFO.Airport.as.a.whole))
+TerminalIntlAverage = colMeans(TerminalIntl)
+
+### DELAY TIME-BASED ANALYSIS
+
+# On-time
+OnTime = subset(DerivedFactorsData, LATECODE == 1)
+OnTime = subset(OnTime, select=c(Q8B.Restaurants,
+                                 Q8H.Information.booths..upper.level.,
+                                 Q8K.AirTrain,
+                                 Q10A.Cleanliness.of.boarding.areas,
+                                 Q10B.Cleanliness.of.domestic.hourly.parking.garage,
+                                 Q10F.Cleanliness.of.Restrooms,
+                                 Q8N.SFO.Airport.as.a.whole))
+OnTimeAverage = colMeans(OnTime)
+
+# Late by <= 15 minutes or possibly delayed
+Late15 = subset(DerivedFactorsData, LATECODE == 2)
+Late15 = subset(Late15, select=c(Q8B.Restaurants, 
+                                 Q8H.Information.booths..upper.level.,
+                                 Q8K.AirTrain,
+                                 Q10A.Cleanliness.of.boarding.areas,
+                                 Q10B.Cleanliness.of.domestic.hourly.parking.garage,
+                                 Q10F.Cleanliness.of.Restrooms,
+                                 Q8N.SFO.Airport.as.a.whole))
+Late15Average = colMeans(Late15)
+
+# Late by 16 - 45 minutes or possibly delayed
+Late45 = subset(DerivedFactorsData, LATECODE == 3)
+Late45 = subset(Late45, select=c(Q8B.Restaurants, 
+                                 Q8H.Information.booths..upper.level.,
+                                 Q8K.AirTrain,
+                                 Q10A.Cleanliness.of.boarding.areas,
+                                 Q10B.Cleanliness.of.domestic.hourly.parking.garage,
+                                 Q10F.Cleanliness.of.Restrooms,
+                                 Q8N.SFO.Airport.as.a.whole))
+Late45Average = colMeans(Late45)
+
+# Late by 46 - 90 minutes or possibly delayed
+Late90 = subset(DerivedFactorsData, LATECODE == 4)
+Late90 = subset(Late90, select=c(Q8B.Restaurants, 
+                                 Q8H.Information.booths..upper.level.,
+                                 Q8K.AirTrain,
+                                 Q10A.Cleanliness.of.boarding.areas,
+                                 Q10B.Cleanliness.of.domestic.hourly.parking.garage,
+                                 Q10F.Cleanliness.of.Restrooms,
+                                 Q8N.SFO.Airport.as.a.whole))
+Late90Average = colMeans(Late90)
+
+# Late by > 90 minutes or possibly canceled
+SuperLate = subset(DerivedFactorsData, LATECODE == 5)
+SuperLate = subset(SuperLate, select=c(Q8B.Restaurants, 
+                                 Q8H.Information.booths..upper.level.,
+                                 Q8K.AirTrain,
+                                 Q10A.Cleanliness.of.boarding.areas,
+                                 Q10B.Cleanliness.of.domestic.hourly.parking.garage,
+                                 Q10F.Cleanliness.of.Restrooms,
+                                 Q8N.SFO.Airport.as.a.whole))
+SuperLateAverage = colMeans(SuperLate)
+
 source(paste(local_directory,"R/library.R", sep="/"))
 
 ### TO EDIT DEPENDING ON VERSION
