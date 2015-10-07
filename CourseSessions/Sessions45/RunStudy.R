@@ -76,7 +76,7 @@ max_data_report = 50 # can also chance in server.R
 # 1: start application on LOCAL computer, 0: do not start it
 # SELECT 0 if you are running the application on a server 
 # (DEFAULT is 0). 
-start_local_webapp <- 0
+start_local_webapp <- 1
 # NOTE: You need to make sure the shiny library is installing (see below)
 
 ################################################
@@ -111,6 +111,7 @@ if (start_local_webapp){
   Mall_Visits <- read.csv(paste(local_directory, "data/Mall_Visits.csv", sep = "/"), sep=";", dec=",") # this contains only the matrix ProjectData
   Boats <- read.csv(paste(local_directory, "data/Boats.csv", sep = "/"), sep=";", dec=",") # this contains only the matrix ProjectData
   Boats=data.matrix(Boats) # this file needs to be converted to "numeric"....
+  SFO <- read.csv(paste(local_directory, "data/SFO.csv", sep = "/"), sep=";", dec=",") # this contains only the matrix ProjectData
   
   # now run the app
   runApp(paste(local_directory,"tools", sep="/"))  

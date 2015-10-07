@@ -1,11 +1,10 @@
-
 ############################################
 ############################################
 # SOME LINES TO MODIFY (if you add/remove lines, these may change!): 24, 28, 29, 30, 34, 38, 42, 46, 49, 52 (typically only 29, 34, 38, 42, 46)
 ############################################
 ############################################
 
-# Project Name: "Sessions 2-3 of INSEAD Data Analytics for Business Course: "Dimensionality Reduction and Derived Attributes"
+# Project Name: "(Big) Data Analytics for SFO Airport"
 
 rm(list = ls( ))
 
@@ -22,23 +21,19 @@ local_directory <- paste(getwd(),"CourseSessions/Sessions23", sep="/")
 cat("\n *********\n WORKING DIRECTORY IS ", local_directory, "\n PLEASE CHANGE IT IF IT IS NOT CORRECT using setwd(..) - type help(setwd) for more information \n *********")
 
 # Please ENTER the name of the file with the data used. The file should contain a matrix with one row per observation (e.g. person) and one column per attribute. THE NAME OF THIS MATRIX NEEDS TO BE ProjectData (otherwise you will need to replace the name of the ProjectData variable below with whatever your variable name is, which you can see in your Workspace window after you load your file)
-datafile_name="MBAadmin" #  do not add .csv at the end! make sure the data are numeric!!!! check your file!
+datafile_name="SFO" #  do not add .csv at the end! make sure the data are numeric!!!! check your file!
 
 # Please ENTER the filename of the Report and Slides (in the doc directory) to generate 
-
-#report_file = "Report_s23"
-#report_file = "MyBoatsFactor"
 report_file = "Report_SFO"
-#slides_file = "Slides_s23"
 slides_file = "Slides_SFO"
 
 # Please ENTER then original raw attributes to use. 
 # Please use numbers, not column names! e.g. c(1:5, 7, 8) uses columns 1,2,3,4,5,7,8
-factor_attributes_used= c(1:7)
+factor_attributes_used= c(29:48)
 
 # Please ENTER the selection criterions for the factors to use. 
 # Choices: "eigenvalue", "variance", "manual"
-factor_selectionciterion = "eigenvalue"
+factor_selectionciterion = "manual"
 
 # Please ENTER the desired minumum variance explained 
 # (ONLY USED in case "variance" is the factor selection criterion used). 
@@ -46,7 +41,7 @@ minimum_variance_explained = 65  # between 1 and 100
 
 # Please ENTER the number of factors to use 
 # (ONLY USED in case "manual" is the factor selection criterion used).
-manual_numb_factors_used = 2
+manual_numb_factors_used = 6
 
 # Please ENTER the rotation eventually used (e.g. "none", "varimax", "quatimax", "promax", "oblimin", "simplimax", and "cluster" - see help(principal)). Defauls is "varimax"
 rotation_used="varimax"

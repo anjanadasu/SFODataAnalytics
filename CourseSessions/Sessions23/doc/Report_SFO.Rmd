@@ -1,0 +1,190 @@
+<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
+<style type="text/css"> body {padding: 10px 30px 10px 30px;} table,th, td {text-align: center;} </style>
+
+
+(Big) Data Analytics for SFO Airport
+========================================================
+**Anjana Dasu, Pal Grewal, Kyunghee Kim, Devina Pasta, Dan Schwarz**
+
+
+About San Francisco Internaational Airport (SFO)
+--------------------------------------------------------
+San Francisco International Airport (SFO) is the seventh busiest airport in the United States and the fifteenth busiest airport in the world by passenger count.
+
+The Data
+--------------------------------------------------------
+Our dataset consists of data pertaining to customer demographics and satisfaction with SFO Airport’s facilities, services, and initiatives. The data was collected in May 2011, through interviews with 3,872 customers in each of SFO’s terminals and boarding areas. Customers were asked to rate the Airport in 20 categories, including 6 cleanliness ratings. Additional data collected include customer spending behavior, mode of arrival to the airport, and awareness of SFO initiatives.
+
+<a href="http://www.flysfo.com/media/customer-survey-data" target="_blank">SFO Customer Survey Data</a>
+
+The Decisions
+--------------------------------------------------------
+
+
+The Analysis
+--------------------------------------------------------
+### SFO Facilities and Customers
+We believed that our 
+
+Customers were first asked to rate several attributes (e.g. restaurants, information monitors, etc.) of SFO on a rating scale of 1-5 (1 = Unacceptable, 2 = Below Average, 3 = Average, 4 = Good, 5 = Outstanding). Next, customers were asked to rate the general cleanliness of various airport facilities (e.g. boarding areas, restrooms, etc.) on the same scale.
+
+<i><b>Note:</b> Customers were allowed to leave a field blank, i.e. not rate the facility (represented by 0) or or indicate that they'd never used or visited the facility (represented by 6). We were worried that this might skew our summary findings -- for instance, by bringing the mean up or down. We considered throwing out all rows containing either a 0 or 6 in any column; however, this would deprive us of useful data (and leave us with only 10% of the responses). We then noticed that the number of 0s (fields left blank) was close to the number (~1.2x) of 6s (facilities not visited), so the pull in either direction could be offset.</i>
+
+```{r echo=FALSE, message=FALSE, prompt=FALSE, results='asis'}
+# let's make the data into data.matrix classes so that we can easier visualize them
+ProjectDataFactor = data.matrix(ProjectDataFactor)
+ProjectData = data.matrix(ProjectData)
+```
+
+Here are the first `r min(max_data_report, nrow(ProjectData))` rows:
+<div class="row">
+<div class="col-md-6">
+```{r echo=FALSE, message=FALSE, prompt=FALSE, results='asis'}
+show_data = data.frame(round(ProjectDataFactor,2))
+show_data = show_data[1:min(max_data_report,nrow(show_data)),]
+row<-rownames(show_data)
+dfnew<-cbind(row,show_data)
+change<-colnames(dfnew)
+change[1]<-"Variables"
+colnames (dfnew)<-change
+m1<-gvisTable(dfnew,options=list(showRowNumber=TRUE,width=1220, height=min(400,27*(nrow(show_data)+1)),allowHTML=TRUE,page='disable'))
+print(m1,'chart')
+```
+</div>
+</div>
+
+We decided to perform a factor analysis of this data in order to identify the areas on which SFO might focus on for upcoming improvements.
+
+#### Descriptive Summary Statistics
+
+In our case, the data we selected is metric (all data are numbers and numbers have numerical meaning) and appropriately scaled.
+
+<div class="row">
+<div class="col-md-6">
+```{r echo=FALSE, comment=NA, warning=FALSE, message=FALSE,results='asis'}
+show_data = data.frame(round(my_summary(ProjectDataFactor),2))
+#show_data = show_data[1:min(max_data_report,nrow(show_data)),]
+row<-rownames(show_data)
+dfnew<-cbind(row,show_data)
+change<-colnames(dfnew)
+change[1]<-"Variables"
+colnames (dfnew)<-change
+m1<-gvisTable(dfnew,options=list(showRowNumber=TRUE,width=1220, height=min(400,27*(nrow(show_data)+1)),allowHTML=TRUE,page='disable'))
+print(m1,'chart')
+```
+</div>
+</div>
+
+Our takeaways were the following:
+<ul>
+<li>Customers seem to perceive the airport as above average. The scores for each individual attribute, as well as the airport as a whole, are above 3.</li>
+<li>Interestingly, the average score for SFO as a whole is lower than the score for any individual attribute.</li>
+<li>Retail shops, signs and directions, restaurants, and information on screens/monitors had the lowest average scores.</li>
+<li>The average ratings for the rental car and parking facilities are high on both the "general" and "cleanliness" dimensions.</li>
+</ul>
+
+#### Correlation Matrix
+
+In order to see if our factor analysis makes sense, we checked the correlation matrix to verify that the original raw attributes have large enough correlations. There were many attributes which had correlations grater than 0.5.
+
+```{r echo=FALSE, comment=NA, warning=FALSE, message=FALSE, results='asis'}
+thecor = round(cor(ProjectDataFactor),2)
+colnames(thecor)<-colnames(ProjectDataFactor)
+rownames(thecor)<-colnames(ProjectDataFactor)
+## printing the result in a clean-slate table
+#cat(renderHeatmapX(thecor, border=1,center = 0,vrange_up = 1, vrange_down = 1))
+cat(renderHeatmapX(thecor, border=1))
+    
+```
+
+We noticed many of the attributes had high correlations. We noticed a few that seemed particularly logical:
+<ul>
+<li>Restaurants and Retail shops and concessions</li>
+<li>Signs and directions and Escalators, elevators, and moving walkways</li>
+<li>Information on screens/monitors and Information booths on lower and upper levels</li>
+<li>Airport parking facilities and Long term parking lot shuttle bus</li>
+<li>Airport car rental center and Cleanliness of airport car rental center</li>
+</ul>
+
+#### Principle Component Analysis
+
+We examined the eigenvalues, percentage of variance explained, and scree plot to help us determine the number of factors to derive.
+
+***Eigenvalues and Percentage of Variance Explained***
+```{r echo=FALSE, comment=NA, warning=FALSE, error=FALSE,message=FALSE,results='asis'}
+Variance_Explained_Table_results<-PCA(ProjectDataFactor, graph=FALSE)
+Variance_Explained_Table<-Variance_Explained_Table_results$eig
+Variance_Explained_Table_copy<-Variance_Explained_Table
+
+
+row=1:nrow(Variance_Explained_Table)
+name<-paste("Component No:",row,sep="")
+Variance_Explained_Table<-cbind(name,Variance_Explained_Table)
+Variance_Explained_Table<-as.data.frame(Variance_Explained_Table)
+colnames(Variance_Explained_Table)<-c("Components", "Eigenvalue", "Percentage_of_explained_variance", "Cumulative_percentage_of_explained_variance")
+
+m<-gvisTable(Variance_Explained_Table,options=list(width=1200, height=min(400,27*(nrow(show_data)+1)),allowHTML=TRUE,page='disable'),formats=list(Eigenvalue="#.##",Percentage_of_explained_variance="#.##",Cumulative_percentage_of_explained_variance="#.##"))
+print(m,'chart')
+```
+
+```{r Fig1, echo=FALSE, comment=NA, results='asis', message=FALSE, fig.align='center', fig=TRUE}
+
+eigenvalues  <- Variance_Explained_Table[,2]
+df           <- cbind(as.data.frame(eigenvalues), c(1:length(eigenvalues)), rep(1, length(eigenvalues)))
+colnames(df) <- c("eigenvalues", "components", "abline")
+Line         <- gvisLineChart(as.data.frame(df), xvar="components", yvar=c("eigenvalues","abline"), options=list(title='Scree plot', legend="right", width=900, height=600, hAxis="{title:'Number of Components', titleTextStyle:{color:'black'}}", vAxes="[{title:'Eigenvalues'}]",  series="[{color:'green',pointSize:3, targetAxisIndex: 0}]"))
+print(Line, 'chart')
+```
+
+```{r echo=FALSE, comment=NA, warning=FALSE,message=FALSE,results='asis'}
+eigenvalue_factors_selected = sum(Variance_Explained_Table_copy[,1] >= 1)
+variance_factors_selected = 1:head(which(Variance_Explained_Table_copy[,"cumulative percentage of variance"]>= minimum_variance_explained),1)
+if (factor_selectionciterion == "eigenvalue")
+  factors_selected = eigenvalue_factors_selected
+if (factor_selectionciterion == "variance")
+  factors_selected = variance_factors_selected
+if (factor_selectionciterion == "manual")
+  factors_selected = manual_numb_factors_used
+
+```
+
+Based on eigenvalue > 1 or scree plot, we would choose to use `r eigenvalue_factors_selected` components. If we wanted to to explain `r minimum_variance_explained`% of the variance, we would choose to use `r variance_factors_selected` components. 
+
+However, we ultimately chose to manually select `r factors_selected` factors based on our rotated factors matrix. as this would explain ~75% of the variance and could be translated into an identifiable set of components, namely:
+<ol>
+<li>Airport interior - exhibits, shops, directions, walkways</li>
+<li>Information - screens/monitors, booths</li>
+<li>Transit - entering and exiting the airport</li>
+<li>Boarding areas and general ambience</li>
+<li>Cleanliness</li>
+<li>Interterminal Connectivity - parking and transportation</li>
+</ol>
+
+This grouping was derived from our rotated factors matrix:
+
+```{r echo=FALSE, comment=NA, warning=FALSE, message=FALSE,results='asis'}
+Rotated_Factors_thres <- Rotated_Factors
+Rotated_Factors_thres[abs(Rotated_Factors_thres) < MIN_VALUE]<-NA
+colnames(Rotated_Factors_thres)<- colnames(Rotated_Factors)
+rownames(Rotated_Factors_thres)<- rownames(Rotated_Factors)
+
+show_data <- Rotated_Factors_thres 
+#show_data = show_data[1:min(max_data_report,nrow(show_data)),]
+row<-rownames(show_data)
+dfnew<-cbind(row,show_data)
+change<-colnames(dfnew)
+change[1]<-"Variables"
+colnames (dfnew)<-change
+m1<-gvisTable(dfnew,options=list(showRowNumber=TRUE,width=1220, height=min(400,27*(nrow(show_data)+1)),allowHTML=TRUE,page='disable'))
+print(m1,'chart')
+```
+
+For each of the factors, we decided upon the original raw attribute which we felt was representative:
+<ul>
+<li>Restaurants</li>
+<li>Information booths upper level</li>
+<li>Cleanliness of domestic hourly parking garage</li>
+<li>Cleanliness of boarding areas</li>
+<li>Cleanliness of restrooms</li>
+<li>Airtrain</li>
+</ul>

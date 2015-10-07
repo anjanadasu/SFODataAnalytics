@@ -24,7 +24,7 @@ heavy computation or traffic on the server, in which case you should simply wait
     HTML("<center><h4>Choose a data file:<h4>"),    
     HTML("<br>"),
     selectInput('datafile_name_coded', '',
-                c("Mall_Visits","Boats"),multiple = FALSE),
+                c("Mall_Visits","Boats", "SFO"),multiple = FALSE),
     
     ###########################################################
     # STEP 2.2: read the INPUTS. 
