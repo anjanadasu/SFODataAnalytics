@@ -79,12 +79,21 @@ if (datafile_name == "Boats")
 factor_attributes_used = unique(sapply(factor_attributes_used,function(i) min(ncol(ProjectData), max(i,1))))
 ProjectDataFactor=ProjectData[,factor_attributes_used]
 
-### TERMINAL-BASED ANALYSIS
 derived_factor_columns = c(4, 7, 30, 36, 39, 43, 44, 48, 42)
 derived_factor_columns = unique(sapply(derived_factor_columns,function(i) min(ncol(ProjectData), max(i,1))))
 DerivedFactorsData = ProjectData[,derived_factor_columns]
 # Convert to data frame
 DerivedFactorsData = data.frame(DerivedFactorsData)
+DerivedFactors = subset(DerivedFactorsData, select=c(Q8B.Restaurants, 
+                                       Q8H.Information.booths..upper.level.,
+                                       Q8K.AirTrain,
+                                       Q10A.Cleanliness.of.boarding.areas,
+                                       Q10B.Cleanliness.of.domestic.hourly.parking.garage,
+                                       Q10F.Cleanliness.of.Restrooms,
+                                       Q8N.SFO.Airport.as.a.whole))
+DerivedFactorsAverage = colMeans(DerivedFactors)
+
+### TERMINAL-BASED ANALYSIS
 
 # Terminal 1
 Terminal1 = subset(DerivedFactorsData, TERM == 1)

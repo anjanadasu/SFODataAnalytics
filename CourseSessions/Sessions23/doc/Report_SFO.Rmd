@@ -5,13 +5,13 @@ table.average_analysis > tbody > tr > td {
 padding: 10px; 
 border: 1px solid #000;
 }
+
 table.average_analysis > thead > tr > th { 
 padding: 10px; 
 border: 1px solid #000;
 }
 
 </style>
-
 
 (Big) Data Analytics for SFO Airport
 ========================================================
@@ -41,7 +41,7 @@ There could be resistance from labor unions due to changed incentive systems and
 #### Measuring Value of Proposal
 Through concrete improvements for certain areas at the airport, SFO can ensure better passenger experience. To measure the impact, SFO can conduct a similar survey post implementation of changes and check if the ratings for the specific parameters have improved. 
 
-The Analysis
+Factor Analysis
 --------------------------------------------------------
 ### SFO Facilities
 
@@ -220,7 +220,7 @@ m1<-gvisTable(dfnew,options=list(showRowNumber=TRUE,width=1220, height=min(400,2
 print(m1,'chart')
 ```
 
-For each of the factors, we decided upon the original raw attribute which we felt was representative:
+For the simplicity, we decided upon the original raw attribute which we felt was representative of each factor:
 <ul>
 <li>Restaurants</li>
 <li>Information booths upper level</li>
@@ -230,7 +230,33 @@ For each of the factors, we decided upon the original raw attribute which we fel
 <li>Airtrain</li>
 </ul>
 
-<!-- @TODO: FACTOR SCORES: In this case, factor scores will represent the area of the airport it seems most relevant to focus on. -->
+The average scores for these factors were as follows:
+<table class="average_analysis">
+<thead>
+<tr>
+<th>RETAIL (Retaurants)</th>
+<th>INFORMATION (Information booths upper level)</th>
+<th>TRANSIT (Cleanliness of domestic hourly parking garage)</th>
+<th>BOARDING AREA (Cleanliness of boarding areas)</th>
+<th>CLEANLINESS (Cleanliness of restrooms)</th>
+<th>INTERCONNECTEDNESS (Airtrain)</th>
+<th>OVERALL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>`r round(DerivedFactorsAverage[1], digits=2)`</td>
+<td>`r round(DerivedFactorsAverage[2], digits=2)`</td>
+<td>`r round(DerivedFactorsAverage[3], digits=2)`</td>
+<td>`r round(DerivedFactorsAverage[4], digits=2)`</td>
+<td>`r round(DerivedFactorsAverage[5], digits=2)`</td>
+<td>`r round(DerivedFactorsAverage[6], digits=2)`</td>
+<td>`r round(DerivedFactorsAverage[7], digits=2)`</td>
+</tr>
+</tbody>
+</table>
+
+<!-- @TODO (anjana): Ask professor about factor scores. -->
 
 ### Terminal-Based Analysis
 

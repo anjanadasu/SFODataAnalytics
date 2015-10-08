@@ -1,0 +1,203 @@
+<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
+<style type="text/css"> body {padding: 10px 30px 10px 30px;} table,th, td {text-align: center;} 
+
+table.average_analysis > tbody > tr > td { 
+padding: 10px; 
+border: 1px solid #000;
+}
+
+table.average_analysis > thead > tr > th { 
+padding: 10px; 
+border: 1px solid #000;
+}
+
+</style>
+
+(Big) Data Analytics for SFO Airport II
+========================================================
+**Anjana Dasu, Pal Grewal, Kyunghee Kim, Devina Pasta, Dan Schwarz**
+
+Cluster Analysis
+--------------------------------------------------------
+### Customers
+We wanted to understand the types of people visiting the airport. We believe that there could be a few different segments, and that we could potential design and position airport services better to meet the needs of certain segments.
+
+### Clustering Variables
+#### Segmentation Attributes
+We decided to use descriptive attributes for segmenting our customers. These were as follows:
+<ul>
+<li>Destination - DESTMARK</li>
+<li>Flight departure time - STRATA</li>
+<li>Airline type - ATYPE</li>
+<li>Purpose - business, vacation, family, event, etc. - Q2_1</li>
+<li>Airport arrival method - Q3_1</li>
+<li>Checking baggage - Q4A</li>
+<li>Flying frequency - Q7</li>
+<li>Airport shopping/eating behavior - Q5, Q6</li>
+</ul>
+(We actually chose these from a factor analysis of all the descriptive attributes. For example, the Destination factor was composed of the DESTMARK, DESTGEO, and TERM components, and we chose DESTMARK to be most representative.)
+
+#### Profiling Attributes
+We decided to use a broader set of attributes for profiling - the descriptive attributes, as well as perceptions of airport facilities and demographic information. hese were as follows:
+<ul>
+<li>Destination - DESTMARK</li>
+<li>Flight departure time - STRATA</li>
+<li>Airline type - ATYPE</li>
+<li>Purpose - business, vacation, family, event, etc. - Q2_1</li>
+<li>Airport arrival method - Q3_1</li>
+<li>Checking baggage - Q4A</li>
+<li>Flying frequency - Q7</li>
+<li>Airport shopping and eating behavior - Q5 and Q6 respectively</li>
+<li>Waiting time - PASSMIN</li>
+<li>Restaurants - Q8B</li>
+<li>Information booths upper level - Q8H</li>
+<li>Cleanliness of domestic hourly parking garage - Q10B</li>
+<li>Cleanliness of boarding areas - Q10A</li>
+<li>Cleanliness of restrooms - Q10F</li>
+<li>Airtrain - Q8K</li>
+<li>SFO Airport as a whole - Q8N</li>
+<li>County from which customer came to airport - Q14</li>
+<li>Age - Q19</li>
+<li>Gender - Q20</li>
+<li>Househould Income - Q21</li>
+</ul>
+
+### Number of Clusters
+We looked at the Dendogram to decide the number of clusters to create. From this, we decided that `r numb_clusters_used` seemed appropriate.
+
+```{r echo=FALSE, comment=NA, warning=FALSE, message=FALSE, fig.align='center', results='asis'}
+Hierarchical_Cluster_distances <- dist(ProjectData_segment, method=distance_used)
+Hierarchical_Cluster <- hclust(Hierarchical_Cluster_distances, method=hclust_method)
+# Display dendogram
+plot(Hierarchical_Cluster, main = NULL, sub=NULL, labels = 1:nrow(ProjectData_segment), xlab="Our Observations", cex.lab=1, cex.axis=1) 
+# Draw dendogram with red borders around the 3 clusters
+rect.hclust(Hierarchical_Cluster, k=numb_clusters_used, border="red") 
+```
+
+### Average Values by Segment
+
+After deciding the number of clusters to use based on the dendogram, we can see how the responses to our survey differ across segments. The average values of our data for the total population as well as within each customer segment are:
+
+```{r echo=FALSE, comment=NA, warning=FALSE, message=FALSE,results='asis'}
+cluster_memberships_hclust <- as.vector(cutree(Hierarchical_Cluster, k=numb_clusters_used)) # cut tree into 3 clusters
+cluster_ids_hclust=unique(cluster_memberships_hclust)
+
+ProjectData_with_hclust_membership <- cbind(1:length(cluster_memberships_hclust),cluster_memberships_hclust)
+colnames(ProjectData_with_hclust_membership)<-c("Observation Number","Cluster_Membership")
+```
+
+
+```{r echo=FALSE, comment=NA, warning=FALSE, message=FALSE,results='asis'}
+kmeans_clusters <- kmeans(ProjectData_segment,centers= numb_clusters_used, iter.max=2000, algorithm=kmeans_method)
+
+ProjectData_with_kmeans_membership <- cbind(1:length(kmeans_clusters$cluster),kmeans_clusters$cluster)
+colnames(ProjectData_with_kmeans_membership)<-c("Observation Number","Cluster_Membership")
+```
+
+```{r echo=FALSE, comment=NA, warning=FALSE, message=FALSE,results='asis'}
+cluster_memberships_kmeans <- kmeans_clusters$cluster 
+cluster_ids_kmeans <- unique(cluster_memberships_kmeans)
+```
+
+```{r echo=FALSE, comment=NA, warning=FALSE, message=FALSE,results='asis'}
+cluster_memberships <- cluster_memberships_hclust
+cluster_ids <-  cluster_ids_hclust  
+if (profile_with == "hclust"){
+  cluster_memberships <- cluster_memberships_hclust
+  cluster_ids <-  cluster_ids_hclust  
+  }
+if (profile_with == "kmeans"){
+  cluster_memberships <- cluster_memberships_kmeans
+  cluster_ids <-  cluster_ids_kmeans
+  }
+
+# SAVE THE DATA in the cluster file
+NewData = matrix(cluster_memberships,ncol=1)
+write.csv(NewData,file=cluster_file)
+
+population_average = matrix(apply(ProjectData_profile, 2, mean), ncol=1)
+colnames(population_average) <- "Population"
+Cluster_Profile_mean <- sapply(sort(cluster_ids), function(i) apply(ProjectData_profile[(cluster_memberships==i), ], 2, mean))
+if (ncol(ProjectData_profile) <2)
+  Cluster_Profile_mean=t(Cluster_Profile_mean)
+colnames(Cluster_Profile_mean) <- paste("Segment", 1:length(cluster_ids), sep=" ")
+cluster.profile <- cbind (population_average,Cluster_Profile_mean)
+```
+
+<div class="row">
+<div class="col-md-6">
+```{r echo=FALSE, comment=NA, warning=FALSE, message=FALSE, results='asis'}
+show_data = data.frame(round(cluster.profile,2))
+#show_data = show_data[1:min(max_data_report,nrow(show_data)),]
+row<-rownames(show_data)
+dfnew<-cbind(row,show_data)
+change<-colnames(dfnew)
+change[1]<-"Variables"
+colnames (dfnew)<-change
+m1<-gvisTable(dfnew,options=list(showRowNumber=TRUE,width=1220, height=min(400,27*(nrow(show_data)+1)),allowHTML=TRUE,page='disable'))
+print(m1,'chart')
+
+```
+</div>
+</div>
+
+Based on these averages, we profiled the customers as follows:
+
+<table class="average_analysis">
+<thead>
+<tr>
+<th>Segment 1: Small Town Flyer</th>
+<th>Segment 2: Average Townie</th>
+<th>Segment 3: Frequent Flyer</th>
+<th>Segment 4: Business Folk</th>
+<th>Segment 5: One-off/Random Flyer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Middle of the day flights</td>
+<td>Rental car/train user</td>
+<td>Likely early morning flights</td>
+<td>Rental car/train user</td>
+<td>Spends time at airport</td>
+</tr>
+<tr>
+<td>Unlikely to make a purchase</td>
+<td>Strong window shopper</td>
+<td>Drives in early for flights</td>
+<td>Minimizes time at airport</td>
+<td>Finds information confusing maybe</td>
+</tr>
+<tr>
+<td>Low income group</td>
+<td>Lives in heart of the city</td>
+<td>Likely to make a purchase</td>
+<td>Likely to make a purchase</td>
+<td>Low income group</td>
+</tr>
+<tr>
+<td>Higher mix of women/kids</td>
+<td>Really doesn't like the airport</td>
+<td>High income group</td>
+<td>Information seeker</td>
+<td>Non-major airline traveller</td>
+</tr>
+<tr>
+<td>Just happy to travel</td>
+<td></td>
+<td>Big city destinations</td>
+<td></td>
+<td>Checks luggage</td>
+</tbody>
+</table>
+
+Conclusions
+--------------------------------------------------------
+We were able to draw some basic conclusions from this dataset (based on our factor/cluster analyses) to suggest business improvements to the SFO airport:
+<ul>
+<li>They should focus on revamping their older terminals, like Terminal 1.</li>
+<li>Restaurants could use improvements, but it's not obvious what improvements to make (better food, better service?). They could collect more data on this to make better decisions.</li>
+<li>Boarding areas -- particularly in older terminals -- could be kept cleaner and nicer.</li>
+<li>Uncertainty seems to be a critical cause of frustration in the airport, so it would be good to give clear announcements of delays. Also, perhaps longer delays aren't so bad if there good restaurants/retail outlets to spend time at.</li>
+<li>The survey was very long, and despite scoring the airport rather highly on average on all the individual attributes, people still had a lower overall score for the airport. Perhaps it's a combination of factors that gives people this perception. Perhaps the survey didn't tap into the reasons for this perception.</li>
+</ul>
